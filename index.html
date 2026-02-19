@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>抚州民谣集座位管理</title>
+<style>
+  *{box-sizing:border-box}
+  body{background:#e0d5c9;font-family:Microsoft YaHei,sans-serif;padding:20px 0;margin:0}
+  .container{width:100%;max-width:1500px;margin:0 auto;text-align:center}
+  .seat-map{background:#fff;width:100%;min-width:1500px;padding:20px 15px 15px 315px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,0.08);position:relative;min-height:1400px}
+  .main-title{
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size:28px;
+    font-weight:bold;
+    color:#333;
+    white-space:nowrap;
+  }
+  .main-stage-label{width:262px;height:139px;margin:0 auto;transform:translateX(-266px);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:22px;background:#9575cd;border-radius:14px}
+  .firepit-container{position:absolute;top:163px;left:50%;transform:translateX(calc(-50% - 118px));display:flex;height:28px;padding:0 2.5px;z-index:25}
+  .firepit-seat{width:28px;height:28px;margin:0 2.5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;background:#e0e0e0;border:1px solid #ccc;border-radius:4px}
+  .six-seats-aisle{position:absolute;left:254px;top:22px;width:60px;height:1210px;background:#e3f2fd;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#197ff3;font-weight:bold;z-index:28;writing-mode:vertical-rl;letter-spacing:4px;}
+  .vertical-aisle-88 {
+    position:absolute;
+    left:1034px;
+    top:22px;
+    width:60px;height:1210px;
+    background:#e3f2fd;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    color:#197ff3;
+    font-weight:bold;
+    writing-mode:vertical-rl;letter-spacing:4px;
+    z-index:27;
+  }
+  .aisle, .extra-aisle{
+    width:706px;
+    transform:translateX(-226px);
+    background:#e3f2fd;
+    color:#197ff3;
+    font-weight:bold;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .aisle{height:60px;margin:20px auto 8px}
+  .aisle.aisle-2,.aisle.aisle-3,.aisle.aisle-4{height:30px;margin:10px auto 8px !important}
+  .aisle.aisle-5{height:30px;margin:20px auto 8px}
+  .extra-aisle{height:60px;margin:10px auto}
+  .left-six-seats-container{position:absolute;left:75px;top:22px;z-index:29;display:flex;gap:5px}
+  .six-seats-column{display:flex;flex-direction:column;gap:5px}
+  .new-six-seat{width:84px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+  .left-booth{display:grid;grid-template-columns:repeat(2,56px);gap:5px;position:absolute;left:320px;top:20px;z-index:30}
+  .left-seat{width:56px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+  .right-booth{display:grid;grid-template-columns:56px 84px;gap:5px;position:absolute;right:78px;top:20px;transform:translateX(-400px);z-index:30}
+  .right-seat-four{width:56px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+  .right-seat-six{width:84px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+  .stage-right-doubles{position:absolute;top:20px;right:241px;transform:translateX(-394px);z-index:30}
+  .double-row-1{display:flex;gap:5px}
+  .stage-right-double{width:28px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+  .new-double-seat{position:absolute;top:110px;right:231px;transform:translateX(-400px);z-index:30;width:28px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;}
+  .vertical-doubles-container{position:absolute;top:270px;left:calc(50% + 420px + 300px - 140px - 300px + 60px + 10px);z-index:20;display:flex;flex-direction:column;gap:6px}
+  .vertical-double-seat{width:28px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+  .audience-area{margin-top:40px}
+  .row{display:flex;justify-content:flex-start;margin:0 0 6px;padding:0 2.5px}
+  .row.row-27-32{transform:translate(56px,-28px);margin-bottom:-22px}
+  .row.row-41-48{transform:translateY(-28px);margin-bottom:-22px}
+  .seat-45,.seat-46,.seat-47,.seat-48{transform:translateX(84px)}
+  .seat-25{transform:translateX(-56px)}
+  .seat-31{transform:translateX(48px)}
+  .seat-32{transform:translateX(44px)}
+  .pillar-3{transform:translate(24px,28px)}
+  .seat-27,.seat-28,.seat-29{transform:translateX(-2px)}
+  .seat{display:flex;align-items:center;justify-content:center;font-weight:bold;border:2px solid #ccc;border-radius:6px;background:#e0e0e0;margin:0 2.5px;cursor:pointer}
+  .seat.r1{width:84px;height:28px}
+  .seat.r2{width:84px;height:84px}
+  .seat.r3{width:84px;height:56px}
+  .seat.r47{width:84px;height:56px}
+  .seat.r810{width:84px;height:84px}
+  .seat-66,.seat-70{transform:translateY(56px)}
+  .pillar{width:28px;height:28px;background:#000;color:#fff;border:2px solid #333;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
+  .pillar-70{transform:translate(118px,0px)}
+  .pillar-4{transform:translate(-686px, -84px) !important;}
+  .dance-area{width:84px;height:84px;border-radius:50%;background:#9575cd;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;transform:translateY(14px)}
+  .extra-rows-container{margin-top:10px}
+  .extra-row{display:flex;justify-content:flex-start;margin:10px 0;padding:0 2.5px}
+  .extra-seat-double{width:84px;height:28px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;margin:0 2.5px}
+  .extra-seat-six{width:84px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;margin:0 2.5px}
+  .extra-rows-container .extra-row:nth-child(1),.extra-rows-container .extra-row:nth-child(2){transform:translateX(360px)}
+  .extra-rows-container .extra-row:nth-child(3){transform:translateX(270px)}
+  .table-75{position:absolute;width:84px;height:84px;background:#e0e0e0;border:2px solid #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;left:942px;top:981px;z-index:30}
+
+  /* 左下角面板：统计在上，功能在下 */
+  .bottom-panel{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    z-index:9999;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .stats-bar{
+    background:#fff;
+    padding:10px 14px;
+    border-radius:10px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.15);
+    font-size:14px;
+    font-weight:bold;
+    color:#333;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:flex-start;
+  }
+  .toolbar{
+    background:#fff;
+    padding:12px;
+    border-radius:10px;
+    box-shadow:0 3px 15px 0 rgba(0,0,0,0.1);
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .tool-col{display:flex;flex-direction:column;gap:8px;}
+  .toolbar button{
+    padding:10px 16px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:16px;
+    min-width:80px;
+  }
+  #book{background:#e74c3c;color:#fff}
+  #checkin{background:#2ecc71;color:#fff}
+  #turn{background:#ff69b4;color:#fff}
+  #changeTable{background:#3498db;color:#fff}
+  #changeTable:disabled{background:#bdc3c7;cursor:not-allowed}
+  #cancelBtn{background:#f1c40f;color:#333}
+  #selectAll{background:#f39c12;color:#fff}
+  #unselectAll{background:#7f8c8d;color:#fff}
+  #export{background:#000;color:#fff}
+  #clearLogs{background:#9b59b6;color:#fff} /* 新增清空日志按钮样式 */
+  .selected{outline:none;border:5px solid #ff00ff!important}
+  .booked{background:#e74c3c!important;color:#fff!important}
+  .checked{background:#2ecc71!important;color:#fff!important}
+  .turn{background:#ff69b4!important;color:#fff!important}
+  .modal{
+    position:fixed;z-index:10000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal-content{
+    background:#fff;border-radius:8px;width:360px;padding:24px;text-align:center;
+  }
+  .modal-text{margin-bottom:24px;font-size:16px;line-height:1.6}
+  .modal-buttons{display:flex;gap:12px;justify-content:center}
+  .modal-btn{flex:1;padding:10px 0;border-radius:6px;border:none;font-size:16px;cursor:pointer}
+  .modal-cancel{background:#ccc;color:#333}
+  .modal-ok{background:#3498db;color:#fff}
+
+  /* ========== 这里是隐藏123网盘底部文字的代码 ========== */
+  div[style*="position:fixed;bottom"],
+  div[style*="123网盘"],
+  div[style*="多设备同步"] {
+    display:none !important;
+    visibility:hidden !important;
+    height:0 !important;
+    overflow:hidden !important;
+    position:absolute !important;
+    left:-9999px !important;
+    top:-9999px !important;
+  }
+</style>
+</head>
+<body>
+<div class="bottom-panel">
+  <div class="stats-bar">
+    <div id="stat-fire"></div>
+    <div id="stat-double"></div>
+    <div id="stat-four"></div>
+    <div id="stat-six"></div>
+    <div id="stat-bo"></div>
+    <div id="stat-total"></div>
+  </div>
+  <div class="toolbar">
+    <div class="tool-col">
+      <button id="book">预定</button>
+      <button id="checkin">签到</button>
+      <button id="turn">翻台</button>
+      <button id="changeTable" disabled>换桌</button>
+    </div>
+    <div class="tool-col">
+      <button id="selectAll">全选</button>
+      <button id="unselectAll">全不选</button>
+      <button id="cancelBtn">取消</button>
+      <button id="export">导出</button>
+      <button id="clearLogs">清空日志</button> <!-- 新增清空日志按钮 -->
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="seat-map">
+    <div class="main-title">抚州民谣集座位管理</div>
+    <div class="main-stage-label">主舞台</div>
+    <div class="firepit-container">
+      <div class="firepit-seat">T1</div><div class="firepit-seat">T2</div><div class="firepit-seat">T3</div><div class="firepit-seat">T4</div>
+      <div class="firepit-seat">T5</div><div class="firepit-seat">T6</div><div class="firepit-seat">T7</div><div class="firepit-seat">T8</div>
+    </div>
+    <div class="six-seats-aisle">左过道</div>
+    <div class="vertical-aisle-88">右过道</div>
+    <div class="left-six-seats-container">
+      <div class="six-seats-column">
+        <div class="new-six-seat">107</div><div class="new-six-seat">106</div><div class="new-six-seat">105</div><div class="new-six-seat">104</div>
+      </div>
+      <div class="six-seats-column">
+        <div class="new-six-seat">100</div><div class="new-six-seat">101</div><div class="new-six-seat">102</div><div class="new-six-seat">103</div>
+      </div>
+    </div>
+    <div class="left-booth">
+      <div class="left-seat">94</div><div class="left-seat">95</div><div class="left-seat">93</div><div class="left-seat">92</div>
+    </div>
+    <div class="right-booth">
+      <div class="right-seat-four">98</div><div class="right-seat-six">99</div>
+      <div class="right-seat-four">90</div><div class="right-seat-six">89</div>
+    </div>
+    <div class="stage-right-doubles">
+      <div class="double-row-1">
+        <div class="stage-right-double">96</div>
+        <div class="stage-right-double">97</div>
+      </div>
+    </div>
+    <div class="new-double-seat">91</div>
+    <div class="vertical-doubles-container">
+      <div class="vertical-double-seat">88</div><div class="vertical-double-seat">87</div><div class="vertical-double-seat">86</div><div class="vertical-double-seat">85</div>
+      <div class="vertical-double-seat">84</div><div class="vertical-double-seat">83</div><div class="vertical-double-seat">82</div><div class="vertical-double-seat">81</div>
+    </div>
+    <div class="audience-area">
+      <div class="aisle">过道1</div>
+      <div class="row"><div class="seat r1">10</div><div class="seat r1">11</div><div class="seat r1">29</div><div class="seat r1">30</div><div class="seat r1">47</div><div class="seat r1">48</div><div class="seat r1">66</div><div class="seat r1">67</div></div>
+      <div class="row"><div class="seat r2">09</div><div class="seat r2">12</div><div class="seat r2">28</div><div class="seat r2">31</div><div class="seat r2">46</div><div class="seat r2">49</div><div class="seat r2">65</div><div class="seat r2">68</div></div>
+      <div class="aisle aisle-2">过道2</div>
+      <div class="row"><div class="seat r3">08</div><div class="seat r2">13</div><div class="seat r3">27</div><div class="seat r3">32</div><div class="seat r3">45</div><div class="seat r2">50</div><div class="seat r3">64</div><div class="seat r3">69</div></div>
+      <div class="row row-27-32">
+        <div class="seat r3 seat-25">07</div>
+        <div class="seat r3" style="transform:translateX(33px)">26</div>
+        <div class="seat r3" style="transform:translateX(33px)">33</div>
+        <div class="seat r3" style="transform:translateX(33px)">44</div>
+        <div class="pillar pillar-3" style="transform:translate(66px, 28px)">柱3</div>
+        <div class="seat r3 seat-31" style="transform:translateX(96px)">63</div>
+        <div class="seat r3 seat-32" style="transform:translateX(94px)">70</div>
+      </div>
+      <div class="aisle aisle-3">过道3</div>
+      <div class="row"><div class="seat r47">06</div><div class="seat r47">14</div><div class="seat r47">25</div><div class="dance-area">舞蹈区</div><div class="seat r47">43</div><div class="seat r47">51</div><div class="seat r47">62</div><div class="seat r47">71</div></div>
+      <div class="row row-41-48"><div class="seat r47">05</div><div class="seat r47">15</div><div class="seat r47">24</div><div class="seat r47 seat-45">42</div><div class="seat r47 seat-46">52</div><div class="seat r47 seat-47">61</div><div class="seat r47 seat-48">72</div></div>
+      <div class="aisle aisle-4">过道4</div>
+      <div class="row"><div class="seat r47">04</div><div class="seat r47">16</div><div class="seat r47">23</div><div class="seat r47">34</div><div class="seat r47">41</div><div class="seat r47">53</div><div class="seat r47">60</div><div class="seat r47">73</div></div>
+      <div class="row"><div class="seat r810">03</div><div class="seat r810">17</div><div class="seat r810">22</div><div class="seat r810">35</div><div class="seat r810">40</div><div class="seat r810">54</div><div class="seat r810">59</div><div class="seat r810">74</div></div>
+      <div class="aisle aisle-5">过道5</div>
+      <div class="row">
+        <div class="seat r810">02</div>
+        <div class="seat r1" style="transform:translateY(56px)">18</div>
+        <div class="seat r810">21</div>
+        <div class="seat r810">36</div>
+        <div class="pillar pillar-70">柱5</div>
+        <div class="seat r1" style="transform:translateX(62px) translateY(56px)">55</div>
+        <div class="seat r810" style="transform:translateX(62px)">58</div>
+      </div>
+      <div class="row">
+        <div class="seat r810">01</div>
+        <div class="seat r810">19</div>
+        <div class="seat r810">20</div>
+        <div class="seat r810">37</div>
+        <!-- 核心修改：39号桌水平向右移动90px -->
+        <div class="seat r810" style="transform:translateY(-90px) translateX(0px)">39</div>
+        <div class="seat r810" style="transform:translateX(-90px)">38</div>
+        <div class="seat r810" style="transform:translateX(-88px)">56</div>
+        <div class="seat r810" style="transform:translateX(-88px)">57</div>
+        <div class="seat r810" style="transform:translateX(-90px)">76</div>
+        <div class="pillar pillar-4">柱4</div>
+      </div>
+      <div class="table-75">75</div>
+      <div class="extra-aisle">过道6</div>
+      <div class="extra-rows-container">
+        <div class="extra-row"><div class="extra-seat-double">77</div><div class="extra-seat-double">78</div><div class="extra-seat-double">79</div><div class="extra-seat-double">80</div></div>
+        <div class="extra-row"><div class="extra-seat-six">108</div><div class="extra-seat-six">109</div><div class="extra-seat-six">110</div><div class="extra-seat-six">111</div></div>
+        <div class="extra-row"><div class="extra-seat-six">卡1</div><div class="extra-seat-six">卡2</div><div class="extra-seat-six">卡3</div><div class="extra-seat-six">卡4</div><div class="extra-seat-six">卡5</div><div class="extra-seat-six">卡8</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SEAT_KEY = "seat_data";
+const LOG_KEY = "seat_logs";
+const seats = document.querySelectorAll(
+  '.seat,.firepit-seat,.new-six-seat,.left-seat,'+
+  '.right-seat-four,.right-seat-six,.stage-right-double,'+
+  '.vertical-double-seat,.extra-seat-double,.extra-seat-six,'+
+  '.table-75,.new-double-seat'
+);
+
+// 【你指定的最新分类】
+const fireSet   = new Set(["T1","T2","T3","T4","T5","T6","T7","T8"]);
+
+const doubleSet = new Set([
+  "10","11","29","30","47","48","66","67","96","97","91","18","55",
+  "77","78","79","80","81","82","83","84","85","86","87","88"
+]);
+
+const fourSet   = new Set([
+  "04","16","23","34","41","53","60","73","05","15","24","42","52","61","72",
+  "06","14","25","43","51","62","71","07","08","26","27","32","33","45","44",
+  "64","63","69","70","92","93","94","95","90","98"
+]);
+
+const boSet     = new Set(["104","105","106","107","卡1","卡2","卡3","卡4","卡5","卡8"]);
+
+// 排序优先级：火塘(1) → 双人(2) → 四人(3) → 六人(4) → 卡座(5)
+function getTypeName(table) {
+  if (fireSet.has(table))   return 1;
+  if (doubleSet.has(table)) return 2;
+  if (fourSet.has(table))   return 3;
+  if (boSet.has(table))     return 5;
+  return 4; // 其余全部是六人桌
+}
+
+function getState(el){
+  if(el.classList.contains("booked")) return "booked";
+  if(el.classList.contains("checked")) return "checked";
+  if(el.classList.contains("turn")) return "turn";
+  return "empty";
+}
+
+function setState(el, state){
+  el.classList.remove("booked","checked","turn");
+  if(state && state !== "empty") el.classList.add(state);
+}
+
+function clearSel(){
+  document.querySelectorAll(".selected").forEach(e=>e.classList.remove("selected"));
+}
+
+// 【统计：总计不包含火塘】
+function updateStats(){
+  let fire=0, double=0, four=0, six=0, bo=0;
+  let fireFree=0, doubleFree=0, fourFree=0, sixFree=0, boFree=0;
+
+  seats.forEach(el=>{
+    const t = el.textContent.trim();
+    const isFree = getState(el) === "empty";
+
+    if (fireSet.has(t)) {
+      fire++;
+      if (isFree) fireFree++;
+    } else if (doubleSet.has(t)) {
+      double++;
+      if (isFree) doubleFree++;
+    } else if (fourSet.has(t)) {
+      four++;
+      if (isFree) fourFree++;
+    } else if (boSet.has(t)) {
+      bo++;
+      if (isFree) boFree++;
+    } else {
+      six++;
+      if (isFree) sixFree++;
+    }
+  });
+
+  // 总计 = 双人+四人+六人+卡座（不含火塘）
+  const total = double + four + six + bo;
+  const totalFree = doubleFree + fourFree + sixFree + boFree;
+
+  document.getElementById("stat-fire").innerHTML   = `<span style="color:#ff69b4">火塘</span>：${fire} 张/剩 <span style="color:#2ecc71">${fireFree}</span>`;
+  document.getElementById("stat-double").innerHTML = `<span style="color:#ff69b4">双人</span>：${double} 张/剩 <span style="color:#2ecc71">${doubleFree}</span>`;
+  document.getElementById("stat-four").innerHTML   = `<span style="color:#ff69b4">四人</span>：${four} 张/剩 <span style="color:#2ecc71">${fourFree}</span>`;
+  document.getElementById("stat-six").innerHTML    = `<span style="color:#ff69b4">六人</span>：${six} 张/剩 <span style="color:#2ecc71">${sixFree}</span>`;
+  document.getElementById("stat-bo").innerHTML     = `<span style="color:#ff69b4">卡座</span>：${bo} 张/剩 <span style="color:#2ecc71">${boFree}</span>`;
+  document.getElementById("stat-total").innerHTML  = `<span style="color:#ff69b4">总计</span>：${total} 张/剩 <span style="color:#2ecc71">${totalFree}</span>`;
+}
+
+function save(){
+  const arr = Array.from(seats).map(el => ({state: getState(el)}));
+  localStorage.setItem(SEAT_KEY, JSON.stringify(arr));
+  saveToWebDAV(); // 只加这一行
+}
+
+function load(){
+  const s = localStorage.getItem(SEAT_KEY);
+  if(!s) return;
+  const list = JSON.parse(s);
+  seats.forEach((el,i) => list[i] && setState(el, list[i].state));
+}
+
+// 北京时间到秒
+function getBJTimeStr() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${h}:${m}:${s}`;
+}
+
+function log(table, act){
+  const logs = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
+  logs.push({
+    time: getBJTimeStr(),
+    ts: Date.now(),
+    table: table,
+    act: act
+  });
+  localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+}
+
+function showConfirmModal(text, onConfirm) {
+  const modal = document.createElement("div");
+  modal.className = "modal";
+  modal.innerHTML = `
+  <div class="modal-content">
+    <div class="modal-text">${text}</div>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-cancel">取消</button>
+      <button class="modal-btn modal-ok">确认</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector(".modal-cancel").onclick = () => {
+    document.body.removeChild(modal);
+  };
+  modal.querySelector(".modal-ok").onclick = () => {
+    document.body.removeChild(modal);
+    onConfirm();
+  };
+}
+
+// 新增：清空日志函数
+function clearLogs() {
+  showConfirmModal("确认清空所有操作日志？此操作不可恢复！", () => {
+    localStorage.setItem(LOG_KEY, JSON.stringify([]));
+    alert("日志已清空");
+  });
+}
+
+function canBook(el)    { return getState(el) === "empty"; }
+function canCheckin(el) { const s = getState(el); return s === "empty" || s === "booked"; }
+function canTurn(el)    { return getState(el) === "checked"; }
+function canCancel(el)  { const s = getState(el); return s === "booked" || s === "checked" || s === "turn"; }
+
+function canSwapSelected() {
+  const sel = Array.from(document.querySelectorAll(".selected"));
+  if (sel.length !== 2) return false;
+  const a = getState(sel[0]);
+  const b = getState(sel[1]);
+  const hasEmpty = (a === "empty" || b === "empty");
+  const hasBookOrCheck = (a === "booked" || a === "checked" || b === "booked" || b === "checked");
+  return hasEmpty && hasBookOrCheck;
+}
+
+function updateBtn() {
+  document.getElementById("changeTable").disabled = !canSwapSelected();
+}
+
+function bindEvents() {
+  seats.forEach(el => {
+    el.onclick = () => {
+      el.classList.toggle("selected");
+      updateBtn();
+    };
+  });
+
+  // 预定（优化体验：提示不可操作的座位）
+  document.getElementById("book").onclick = () => {
+    const selected = Array.from(document.querySelectorAll(".selected"));
+    const list = selected.filter(canBook);
+    const invalid = selected.filter(el => !canBook(el));
+    
+    if (list.length === 0) {
+      return showConfirmModal("请选择空桌进行预定", ()=>{});
+    }
+    
+    let msg = `确认将【${list.map(e => e.textContent.trim()).join("、")}】改为「预定」状态？`;
+    if (invalid.length > 0) {
+      msg += `\n注意：【${invalid.map(e => e.textContent.trim()).join("、")}】不是空桌，无法预定。`;
+    }
+    
+    showConfirmModal(msg, () => {
+      list.forEach(e => { setState(e, "booked"); log(e.textContent.trim(), "预定"); });
+      save(); updateStats(); clearSel(); updateBtn();
+    });
+  };
+
+  // 签到（优化体验）
+  document.getElementById("checkin").onclick = () => {
+    const selected = Array.from(document.querySelectorAll(".selected"));
+    const list = selected.filter(canCheckin);
+    const invalid = selected.filter(el => !canCheckin(el));
+    
+    if (list.length === 0) {
+      return showConfirmModal("请选择空桌或已预定桌签到", ()=>{});
+    }
+    
+    let msg = `确认将【${list.map(e => e.textContent.trim()).join("、")}】改为「签到」状态？`;
+    if (invalid.length > 0) {
+      msg += `\n注意：【${invalid.map(e => e.textContent.trim()).join("、")}】是翻台状态，无法直接签到。`;
+    }
+    
+    showConfirmModal(msg, () => {
+      list.forEach(e => { setState(e, "checked"); log(e.textContent.trim(), "签到"); });
+      save(); updateStats(); clearSel(); updateBtn();
+    });
+  };
+
+  // 翻台（优化体验）
+  document.getElementById("turn").onclick = () => {
+    const selected = Array.from(document.querySelectorAll(".selected"));
+    const list = selected.filter(canTurn);
+    const invalid = selected.filter(el => !canTurn(el));
+    
+    if (list.length === 0) {
+      return showConfirmModal("请选择已签到桌进行翻台", ()=>{});
+    }
+    
+    let msg = `确认将【${list.map(e => e.textContent.trim()).join("、")}】改为「翻台」状态？`;
+    if (invalid.length > 0) {
+      msg += `\n注意：【${invalid.map(e => e.textContent.trim()).join("、")}】不是签到状态，无法翻台。`;
+    }
+    
+    showConfirmModal(msg, () => {
+      list.forEach(e => { setState(e, "turn"); log(e.textContent.trim(), "翻台"); });
+      save(); updateStats(); clearSel(); updateBtn();
+    });
+  };
+
+  // 取消（优化体验）
+  document.getElementById("cancelBtn").onclick = () => {
+    const selected = Array.from(document.querySelectorAll(".selected"));
+    const list = selected.filter(canCancel);
+    const invalid = selected.filter(el => !canCancel(el));
+    
+    if (list.length === 0) {
+      return showConfirmModal("请选择已占用桌取消", ()=>{});
+    }
+    
+    let msg = `确认将【${list.map(e => e.textContent.trim()).join("、")}】恢复为「空桌」？`;
+    if (invalid.length > 0) {
+      msg += `\n注意：【${invalid.map(e => e.textContent.trim()).join("、")}】已是空桌，无需取消。`;
+    }
+    
+    showConfirmModal(msg, () => {
+      list.forEach(e => { setState(e, "empty"); log(e.textContent.trim(), "取消"); });
+      save(); updateStats(); clearSel(); updateBtn();
+    });
+  };
+
+  // 换桌
+  document.getElementById("changeTable").onclick = () => {
+    if (!canSwapSelected()) return showConfirmModal("请选择：1张空桌 + 1张预定/签到桌", ()=>{});
+    const sel = Array.from(document.querySelectorAll(".selected"));
+    const a = sel[0].textContent.trim();
+    const b = sel[1].textContent.trim();
+    showConfirmModal(`确认将【${a}】与【${b}】互换状态？`, () => {
+      const s1 = getState(sel[0]);
+      const s2 = getState(sel[1]);
+      setState(sel[0], s2);
+      setState(sel[1], s1);
+      log(`${a} ↔ ${b}`, "换桌");
+      save(); updateStats(); clearSel(); updateBtn();
+    });
+  };
+
+  document.getElementById("selectAll").onclick = () => {
+    seats.forEach(e => e.classList.add("selected")); updateBtn();
+  };
+  document.getElementById("unselectAll").onclick = () => {
+    clearSel(); updateBtn();
+  };
+
+  // 导出：按时间先后 → 火塘→双人→四人→六人→卡座
+  document.getElementById("export").onclick = () => {
+    let logs = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
+    logs.sort((a, b) => {
+      if (a.ts !== b.ts) return a.ts - b.ts;
+      return getTypeName(a.table) - getTypeName(b.table);
+    });
+    const lines = logs.map(i => `${i.time},${i.table},${i.act}`);
+    const csv = "\ufeff时间,桌号,操作\n" + lines.join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+    a.download = "座位操作记录.csv";
+    a.click();
+  };
+
+  // 绑定清空日志事件
+  document.getElementById("clearLogs").onclick = clearLogs;
+}
+
+load();
+updateStats();
+bindEvents();
+loadFromWebDAV();
+startAutoSync();
+
+// 5秒自动同步
+setInterval(() => {
+  save();
+}, 5000);
+</script>
+// ====================== 123网盘 多设备同步 ======================
+const WEBDAV_CONFIG = {
+  url: "https://webdav.123pan.cn/webdav/",
+  user: "【这里改成你123账号】",
+  pass: "【这里改成你123的WebDAV应用密码】",
+  syncFile: "seat_sync.json"
+};
+
+let syncTimer = null;
+
+async function saveToWebDAV() {
+  try {
+    const data = localStorage.getItem("seat_data");
+    const logs = localStorage.getItem("seat_logs");
+    const syncData = JSON.stringify({
+      seat_data: data,
+      seat_logs: logs,
+      updateTime: new Date().toISOString()
+    });
+
+    const res = await fetch(WEBDAV_CONFIG.url + WEBDAV_CONFIG.syncFile, {
+      method: "PUT",
+      headers: {
+        "Authorization": "Basic " + btoa(WEBDAV_CONFIG.user + ":" + WEBDAV_CONFIG.pass),
+        "Content-Type": "application/json"
+      },
+      body: syncData
+    });
+    if (res.ok) console.log("✅ 同步成功");
+  } catch (e) { console.log("❌ 同步失败"); }
+}
+
+async function loadFromWebDAV() {
+  try {
+    const res = await fetch(WEBDAV_CONFIG.url + WEBDAV_CONFIG.syncFile, {
+      method: "GET",
+      headers: {
+        "Authorization": "Basic " + btoa(WEBDAV_CONFIG.user + ":" + WEBDAV_CONFIG.pass)
+      }
+    });
+    if (!res.ok) return;
+    const syncData = await res.json();
+    if (syncData.seat_data) localStorage.setItem(SEAT_KEY, syncData.seat_data);
+    if (syncData.seat_logs) localStorage.setItem(LOG_KEY, syncData.seat_logs);
+    load(); updateStats();
+  } catch (e) {}
+}
+
+function startAutoSync() {
+  if (syncTimer) clearInterval(syncTimer);
+  syncTimer = setInterval(saveToWebDAV, 3000);
+}
+// =================================================================
+</body>
+</html>
